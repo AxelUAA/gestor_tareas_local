@@ -79,14 +79,17 @@ Si se actualizan los paquetes, hay que descargar de nuevo ambos archivos.
 
 ## Pruebas
 
-| ID | Acción | Web (Chrome 158) |
-|----|--------|------------------|
-| P1 | Agregar 3 tareas, cerrar y abrir | ✅ permanecen |
-| P2 | Marcar completada y reiniciar | ✅ se conserva |
-| P3 | Editar título y reiniciar | ✅ nuevo título |
-| P4 | Eliminar y reiniciar | ✅ no reaparece |
-| P5 | Título vacío / solo espacios | ✅ no se registra, muestra mensaje |
-| P6 | Recargar y cerrar/abrir pestaña | ✅ datos permanecen |
+| ID | Acción | Windows 11 (release) | Web (Chrome 158) |
+|----|--------|----------------------|------------------|
+| P1 | Agregar 3 tareas, cerrar y abrir | ✅ permanecen | ✅ permanecen |
+| P2 | Marcar completada y reiniciar | ✅ se conserva | ✅ se conserva |
+| P3 | Editar título y reiniciar | ✅ nuevo título | ✅ nuevo título |
+| P4 | Eliminar y reiniciar | ✅ no reaparece | ✅ no reaparece |
+| P5 | Título vacío / solo espacios | ✅ no se registra | ✅ no se registra |
+| P6 | Recargar y cerrar/abrir pestaña | — | ✅ datos permanecen |
+
+En Windows la base quedó en `Documentos\gestor_tareas.sqlite` (en este equipo,
+`C:\Users\<usuario>\OneDrive\Documents\`, porque Documentos está sincronizado con OneDrive).
 
 Pruebas automatizadas (`flutter test`, 11 pruebas): CRUD sobre SQLite en memoria,
 persistencia real cerrando y reabriendo un archivo `.sqlite`, validación de títulos y
@@ -97,5 +100,5 @@ P5 desde la interfaz.
 | Plataforma | Estado |
 |------------|--------|
 | Web (Chrome) | Probada |
-| Windows | Ver reporte |
+| Windows 11 (escritorio) | Probada |
 | Android, iOS, Linux, macOS | Previstas (mismo código; `drift_flutter` elige la implementación) |
