@@ -42,16 +42,41 @@ class _TareasPageState extends State<TareasPage> {
     }
   }
 
-  void _alternarCompletada(Tarea tarea, bool completada) {
-    _mensaje('Implementar actualización de tarea');
+  Future<void> _alternarCompletada(Tarea tarea, bool completada) async {
+    try {
+      await widget.db.cambiarEstado(tarea.id, completada);
+    } catch (e) {
+      _mensaje('No se pudo actualizar el estado: $e');
+    }
   }
 
-  void _editarTarea(Tarea tarea) {
-    _mensaje('Implementar edición de título');
+  Future<void> _editarTarea(Tarea tarea) async {
+    final nuevo = await showDialog<String>(
+      context: context,
+      builder: (context) => _DialogoEditar(tituloActual: tarea.titulo),
+    );
+    if (nuevo == null) return; // Cancelado.
+    final String titulo;
+    try {
+      titulo = validarTitulo(nuevo);
+    } on ArgumentError catch (e) {
+      _mensaje(e.message.toString());
+      return;
+    }
+    try {
+      await widget.db.actualizarTitulo(tarea.id, titulo);
+    } catch (e) {
+      _mensaje('No se pudo editar la tarea: $e');
+    }
   }
 
-  void _eliminarTarea(Tarea tarea) {
-    _mensaje('Implementar eliminación de tarea');
+  Future<void> _eliminarTarea(Tarea tarea) async {
+    try {
+      await widget.db.eliminarTarea(tarea.id);
+      _mensaje('Tarea "${tarea.titulo}" eliminada');
+    } catch (e) {
+      _mensaje('No se pudo eliminar la tarea: $e');
+    }
   }
 
   void _mensaje(String mensaje) {
@@ -156,6 +181,52 @@ class _TareasPageState extends State<TareasPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Diálogo para editar el título. Es StatefulWidget para poder liberar
+/// su TextEditingController en dispose().
+class _DialogoEditar extends StatefulWidget {
+  final String tituloActual;
+
+  const _DialogoEditar({required this.tituloActual});
+
+  @override
+  State<_DialogoEditar> createState() => _DialogoEditarState();
+}
+
+class _DialogoEditarState extends State<_DialogoEditar> {
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.tituloActual);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Editar tarea'),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        maxLength: maxLongitudTitulo,
+        decoration: const InputDecoration(labelText: 'Título'),
+        onSubmitted: (valor) => Navigator.pop(context, valor),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _controller.text),
+          child: const Text('Guardar'),
+        ),
+      ],
     );
   }
 }
