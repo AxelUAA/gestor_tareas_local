@@ -16,6 +16,10 @@ class TareasPage extends StatefulWidget {
 class _TareasPageState extends State<TareasPage> {
   final TextEditingController _tituloController = TextEditingController();
 
+  /// Al enviar con Enter, Flutter Web quita el foco del campo; se lo
+  /// regresamos para poder capturar varias tareas seguidas.
+  final FocusNode _tituloFoco = FocusNode();
+
   /// El Stream se crea una sola vez aquí (no en build) para no repetir
   /// la consulta en cada reconstrucción de la interfaz.
   late final Stream<List<Tarea>> _tareas;
@@ -37,6 +41,7 @@ class _TareasPageState extends State<TareasPage> {
     try {
       await widget.db.agregarTarea(titulo);
       _tituloController.clear();
+      _tituloFoco.requestFocus();
     } catch (e) {
       _mensaje('No se pudo guardar la tarea: $e');
     }
@@ -89,6 +94,7 @@ class _TareasPageState extends State<TareasPage> {
   @override
   void dispose() {
     _tituloController.dispose();
+    _tituloFoco.dispose();
     super.dispose();
   }
 
@@ -103,6 +109,7 @@ class _TareasPageState extends State<TareasPage> {
           children: [
             TextField(
               controller: _tituloController,
+              focusNode: _tituloFoco,
               maxLength: maxLongitudTitulo,
               decoration: const InputDecoration(
                 labelText: 'Nueva tarea',
